@@ -5,6 +5,7 @@ from PyCommon.md_py_common.py_common.logging import HoornLogger, LogType, Defaul
 	LogDirectoryBuilder
 from src.constants import APP_NAME, MODULE_SEPARATOR_ROOT
 from src.api.openrouter_api import OpenrouterAPI
+from src.conversation.conversation_manager import ConversationManager
 
 
 def smart_split(text, max_line_length=120) -> List[str]:
@@ -52,19 +53,24 @@ def send_message(api: OpenrouterAPI) -> None:
 		print(f"{line}")
 
 if __name__ == "__main__":
+	max_separator_length = 50
+
 	logger: HoornLogger = HoornLogger(
 		min_level=LogType.DEBUG,
 		outputs=[
-			DefaultHoornLogOutput(),
-			FileHoornLogOutput(LogDirectoryBuilder.build_log_directory(APP_NAME, []), max_logs_to_keep=5)
+			DefaultHoornLogOutput(max_separator_length=max_separator_length),
+			FileHoornLogOutput(LogDirectoryBuilder.build_log_directory(APP_NAME, []), max_logs_to_keep=5, max_separator_length=max_separator_length)
 		],
-		separator_root=MODULE_SEPARATOR_ROOT
+		separator_root=MODULE_SEPARATOR_ROOT,
+		max_separator_length=max_separator_length
 	)
 	cli: CommandLineInterface = CommandLineInterface(logger)
 	openrouter_api = OpenrouterAPI(logger)
+	conversation_manager: ConversationManager = ConversationManager(logger, openrouter_api)
 
 	logger.info("AI Backend successfully started!")
 
 	cli.add_command(["test"], action=send_message, description="Run test command", arguments=[openrouter_api])
+	cli.add_command(["converse"], action=lambda: conversation_manager.start_conversation_loop(), description="Start conversation loop")
 
 	cli.start_listen_loop()

@@ -13,6 +13,17 @@ class OpenrouterAPI(ILargeLanguageModelAPI):
 	API for interacting with OpenRouter.
 	"""
 
+	def construct_message(self, content: str, role: str) -> Dict[str, str]:
+		return {
+			"role": role,
+			"content": [
+				{
+                    "type": "text",
+                    "text": content
+                }
+			]
+		}
+
 	def __init__(self, logger: HoornLogger):
 		super().__init__(logger, is_child=True)
 		self._separator = "OpenRouterAPI"
@@ -31,16 +42,8 @@ class OpenrouterAPI(ILargeLanguageModelAPI):
         :return: The response from OpenRouter.
         """
 
-		messages = prior_conversation_context
-		messages.append({
-			"role": "user",
-			"content": [
-				{
-					"type": "text",
-					"text": message
-				}
-			]
-		})
+		messages = prior_conversation_context.copy()  # Copy the prior conversation context to avoid modifying it.
+		messages.append(self.construct_message(role="user", content=message))
 
 		completion = self._client.chat.completions.create(
 			extra_headers={
