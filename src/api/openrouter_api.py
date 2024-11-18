@@ -5,7 +5,7 @@ from openai import OpenAI
 from PyCommon.md_py_common.py_common.logging import HoornLogger
 from secret.secrets import OPENROUTER_KEY
 from src.constants import APP_NAME, MAIN_CHAT_MODEL
-from src.interface_large_language_model_api import ILargeLanguageModelAPI
+from src.api.interface_large_language_model_api import ILargeLanguageModelAPI
 
 
 class OpenrouterAPI(ILargeLanguageModelAPI):

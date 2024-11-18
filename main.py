@@ -1,11 +1,10 @@
-import re
 from typing import List
 
 from PyCommon.md_py_common.py_common.cli_framework import CommandLineInterface
 from PyCommon.md_py_common.py_common.logging import HoornLogger, LogType, DefaultHoornLogOutput, FileHoornLogOutput, \
 	LogDirectoryBuilder
 from src.constants import APP_NAME, MODULE_SEPARATOR_ROOT
-from src.openrouter_api import OpenrouterAPI
+from src.api.openrouter_api import OpenrouterAPI
 
 
 def smart_split(text, max_line_length=120) -> List[str]:
