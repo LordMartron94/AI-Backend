@@ -53,6 +53,10 @@ class OpenrouterAPI(ILargeLanguageModelAPI):
 			messages=messages
 		)
 
+		print_prompt = self._get_print_prompt(messages)
+
+		self._logger.debug(f"${{ignore=default}}Sending: {print_prompt}", separator=self._separator)
+
 		if completion.choices is None:
 			self._logger.error("No response received from OpenRouter", separator=self._separator)
 			return ""
@@ -60,3 +64,11 @@ class OpenrouterAPI(ILargeLanguageModelAPI):
 		response = completion.choices[0].message.content
 		self._logger.debug(f"${{ignore=default}}Gotten: {response}", separator=self._separator)
 		return response
+
+	def _get_print_prompt(self, messages: List[Dict[str, str]]) -> str:
+		message_list: List[str] = []
+
+		for conv_msg in messages:
+			message_list.append(conv_msg["content"][0]["text"])
+
+		return "\n".join(message_list)

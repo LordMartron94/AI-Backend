@@ -1,4 +1,8 @@
+from pathlib import Path
+
 APP_NAME = "AI Backend"
 MODULE_SEPARATOR_ROOT = "AI Backend"
 
-MAIN_CHAT_MODEL: str = "meta-llama/llama-3.1-8b-instruct"
+MAIN_CHAT_MODEL: str = "mistralai/mistral-nemo"
+
+PROJECT_ROOT: Path = Path(__file__).parent.parent
