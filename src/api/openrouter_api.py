@@ -13,17 +13,6 @@ class OpenrouterAPI(ILargeLanguageModelAPI):
 	API for interacting with OpenRouter.
 	"""
 
-	def construct_message(self, content: str, role: str) -> Dict[str, str]:
-		return {
-			"role": role,
-			"content": [
-				{
-                    "type": "text",
-                    "text": content
-                }
-			]
-		}
-
 	def __init__(self, logger: HoornLogger):
 		super().__init__(logger, is_child=True)
 		self._separator = "OpenRouterAPI"
@@ -32,6 +21,17 @@ class OpenrouterAPI(ILargeLanguageModelAPI):
 			api_key=OPENROUTER_KEY,
 			base_url="https://openrouter.ai/api/v1"
 		)
+
+	def construct_message(self, content: str, role: str) -> Dict[str, str]:
+		return {
+			"role": role,
+			"content": [
+				{
+					"type": "text",
+					"text": content
+				}
+			]
+		}
 
 	def send_message(self, message: str, prior_conversation_context: List[Dict[str, str]]) -> str:
 		"""
@@ -60,4 +60,3 @@ class OpenrouterAPI(ILargeLanguageModelAPI):
 		response = completion.choices[0].message.content
 		self._logger.debug(f"${{ignore=default}}Gotten: {response}", separator=self._separator)
 		return response
-
