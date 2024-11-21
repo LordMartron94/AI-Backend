@@ -4,6 +4,7 @@ from openai import OpenAI
 
 from PyCommon.md_py_common.py_common.logging import HoornLogger
 from secret.secrets import OPENROUTER_KEY
+from src.api.tracking.openrouter_generation_tracker import OpenrouterGenerationTracker
 from src.constants import APP_NAME, MAIN_CHAT_MODEL
 from src.api.interface_large_language_model_api import ILargeLanguageModelAPI
 
@@ -21,17 +22,7 @@ class OpenrouterAPI(ILargeLanguageModelAPI):
 			api_key=OPENROUTER_KEY,
 			base_url="https://openrouter.ai/api/v1"
 		)
-
-	def construct_message(self, content: str, role: str) -> Dict[str, str]:
-		return {
-			"role": role,
-			"content": [
-				{
-					"type": "text",
-					"text": content
-				}
-			]
-		}
+		self._tracker = OpenrouterGenerationTracker(logger)
 
 	def send_message(self, message: str, prior_conversation_context: List[Dict[str, str]]) -> str:
 		"""
@@ -62,8 +53,13 @@ class OpenrouterAPI(ILargeLanguageModelAPI):
 			return ""
 
 		response = completion.choices[0].message.content
+		self._tracker.track_generation(completion.id)
+
 		self._logger.debug(f"${{ignore=default}}Gotten: {response}", separator=self._separator)
 		return response
+
+	def get_total_costs_for_session(self) -> float:
+		return self._tracker.get_total_costs_for_generations()
 
 	def _get_print_prompt(self, messages: List[Dict[str, str]]) -> str:
 		message_list: List[str] = []
@@ -72,3 +68,14 @@ class OpenrouterAPI(ILargeLanguageModelAPI):
 			message_list.append(conv_msg["content"][0]["text"])
 
 		return "\n".join(message_list)
+
+	def construct_message(self, content: str, role: str) -> Dict[str, str]:
+		return {
+			"role": role,
+			"content": [
+				{
+					"type": "text",
+					"text": content
+				}
+			]
+		}

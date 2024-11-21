@@ -30,3 +30,11 @@ class ILargeLanguageModelAPI(ABC):
         :return: The response from the large language model.
         """
 		raise NotImplementedError("Subclasses must implement this method. Don't call an interface's method.")
+
+	@abstractmethod
+	def get_total_costs_for_session(self) -> float:
+		"""
+        Calculates the total costs for the session.
+        :return: The total costs for the session.
+        """
+		raise NotImplementedError("Subclasses must implement this method. Don't call an interface's method.")

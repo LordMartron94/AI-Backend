@@ -86,6 +86,7 @@ class ConversationManager:
 		self._cli_tool.add_command(["print", "p"], action=self.print_conversation, description="Prints the conversation.")
 		self._cli_tool.add_command(["set_character", "sc"], action=self.set_user_character, description="Sets the user's character.")
 		self._cli_tool.add_command(["select_ai_character", "sai"], action=self.select_ai_character, description="Selects an AI character.")
+		self._cli_tool.add_command(["print-costs", "pc"], action=self.print_costs, description="Prints the total costs of the current session.")
 
 		self._logger.info(f"Initialized conversation manager", separator=self._module_separator)
 
@@ -162,3 +163,6 @@ Motivated to: {json_response['motivated_to']}
 
 	def start_conversation_loop(self):
 			self._cli_tool.start_listen_loop()
+
+	def print_costs(self):
+		print(f"Total costs: {self._api.get_total_costs_for_session()}")
