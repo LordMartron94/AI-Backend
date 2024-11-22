@@ -33,6 +33,8 @@ This is a short biography of the character:
 
 Here is some standard information about the character's personality:
 {self._character_config.personality}
+
+All imitation must be done according to lore, making sure the character acts in accordance to their established lore and behavior. They must behave naturally.
 """
 
 	def converse(self, prior_conversation: List[Dict[str, Union[str, Any]]], current_user_name: str) -> str:
@@ -42,7 +44,10 @@ Here is some standard information about the character's personality:
 
 		for agent, task in self._agents.items():
 			task.prior_conversation_context = context
-			current_response = agent.converse(task, current_character_name=self._character_config.name, current_user_name=current_user_name)
+			current_response = agent.converse(task, replacements={
+				"char": self._character_config.name,
+				"user": current_user_name
+			})
 
 			current_agent_response = f"""
 Make sure to use the provided data by {agent.get_name()} as input for your response:

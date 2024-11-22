@@ -24,9 +24,14 @@ This is your backstory:
 {self._config.agent_backstory}
 """
 
-	def _get_task_prompt(self, task: AgentTaskModel, current_user_name: str, current_character_name: str) -> str:
+	def _get_task_prompt(self, task: AgentTaskModel, replacements: Dict[str, str]) -> str:
+		task_description = task.task_description
+
+		for replacement_key, replacement_value in replacements.items():
+			task_description = task_description.replace(f"{{{replacement_key}}}", replacement_value)
+
 		return f"""
-Your current task is to {task.task_description.replace("{{char}}", current_character_name).replace("{{user}}", current_user_name)}.
+Your current task is to {task_description}.
 
 The expected output format is:
 {task.expected_output}
@@ -42,7 +47,7 @@ I do not want to see any of the following in your response:
 ```
 """
 
-	def converse(self, task: AgentTaskModel, current_user_name: str, current_character_name: str) -> str:
+	def converse(self, task: AgentTaskModel, replacements: Dict[str, str] = None) -> str:
 		messages_to_be_sent: List[Dict[str, Union[str, Any]]] = [
 			self._api.construct_message(self._get_agent_system_prompt(), role="system")
 		]
@@ -50,7 +55,10 @@ I do not want to see any of the following in your response:
 		for message_in_context in task.prior_conversation_context:
 			messages_to_be_sent.append(message_in_context)
 
-		message = self._get_task_prompt(task, current_user_name, current_character_name)
+		if replacements is None:
+			replacements = {}
+
+		message = self._get_task_prompt(task, replacements)
 
 		self._logger.debug(f"${{ignore=default}}Sending message: {message}", separator=self._module_seperator)
 		response = self._api.send_message(message, messages_to_be_sent)

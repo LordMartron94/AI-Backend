@@ -41,7 +41,10 @@ class OpenrouterAPI(ILargeLanguageModelAPI):
 				"X-Title": APP_NAME,
 			},
 			model=MAIN_CHAT_MODEL,
-			messages=messages
+			messages=messages,
+			response_format={
+				"type": "json_object"
+			}
 		)
 
 		print_prompt = self._get_print_prompt(messages)

@@ -8,6 +8,7 @@ DEFAULT_STORY_AGENT_BACKSTORY = "You are an expert in analyzing stories and tran
 DEFAULT_STORY_AGENT_TASK: str = """
 * Concisely summarize the narrative thus far, emphasizing events directly relevant to the current scenario.
 * Isolate and detail actions/dialogue from {{user}}'s previous message that should shape the character's response.
+* If {{user}} is StoryTeller, then they are not actually present in the story, but rather they shape the story by providing commands.
 """
 
 DEFAULT_STORY_AGENT_EXPECTED_OUTPUT: str = """
@@ -28,6 +29,7 @@ DEFAULT_ENVIRONMENT_AGENT_BACKSTORY = "You are an expert in gathering environmen
 DEFAULT_ENVIRONMENT_AGENT_TASK: str = """
 * Identify time of day (morning, afternoon, evening, night), location, and potential environmental hazards.
 * Determine if any immediate environmental factors require the character's urgent attention. 
+* If {{user}} is StoryTeller, then they are not actually present in the story, but rather they shape the story by providing commands.
 """
 
 
@@ -57,7 +59,8 @@ DEFAULT_PERSONALITY_AGENT_TASK: str = """
 * In this scenario, would {{char}}'s established personality lead them to prioritize long, explanatory responses or short, direct ones?"
 * What assumptions about the scenario is {{char}} making?  
 * Assess the validity of each of {{char}}'s assumptions.  Are they likely to be true, false, or are you unsure?    
-* How does {{char}} perceive their relationship with {{user}}? What facts are {{char}}'s perceptions of {{user}} based on?  
+* How does {{char}} perceive their relationship with {{user}} and the other characters? What facts are {{char}}'s perceptions of {{user}} and the other characters based on?  
+* If {{user}} is StoryTeller, then they are not actually present in the story, but rather they shape the story by providing commands.
 """
 
 DEFAULT_PERSONALITY_AGENT_EXPECTED_OUTPUT: str = """
@@ -71,9 +74,11 @@ JSON:
     "emotional_state": "",
     "character_speech_style": "",
     "relationship_with_user": "",
+    "relationships_with_other_characters": [],
     "assumptions": [],
     "assumption_validity": [],
-    "character_perceptions_of_user": []
+    "character_perceptions_of_user": [],
+    "character_perceptions_of_other_characters": []
 }
 """
 
@@ -230,6 +235,7 @@ DEFAULT_WRITING_AGENT_TASK: str = f"""
 * The writing is to be done in 3rd person Deep POV.
 * After your response, create a summary of the following, contained within a code block, using the context of the conversation and the current response to fill in the variables (feeling, thinking, motivated_to).
 * In the response field goes the final piece of writing done.
+* BE sure to output ONLY according to this format with ONLY the fields given, NOTHING EXTRA.
 """
 
 DEFAULT_WRITING_AGENT_EXPECTED_OUTPUT: str = """
@@ -244,7 +250,7 @@ JSON:
 
 # ====== DEFAULT AGENTS FOR CHARACTER ======
 
-AGENT_DEFINITIONS: List[Dict[str, str]] = [
+CHARACTER_AGENT_DEFINITIONS: List[Dict[str, str]] = [
 	{
 		"name": DEFAULT_STORY_AGENT_NAME,
 		"role": DEFAULT_STORY_AGENT_ROLE,
